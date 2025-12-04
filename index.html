@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>🎄 Amigo Oculto de Natal MDU 🎅</title>
+    <style>
+        /* ESTILOS GERAIS */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0b1a1f; 
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0b1a1f, #1c3643);
+            position: relative;
+            overflow: hidden; 
+        }
+
+        h1, h3 {
+            text-align: center;
+            color: #d11a2a; /* Vermelho Natal */
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            color: #1a9942; /* Verde Pinheiro */
+        }
+
+        #container {
+            max-width: 500px; 
+            width: 90%; 
+            margin: 20px auto; 
+            background: #1c3643; 
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.7); 
+            border: 2px solid #d11a2a; 
+        }
+
+        /* LOGO ESTÁVEL (Ícone de Presente) */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%; 
+            box-shadow: 0 0 15px rgba(26, 153, 66, 0.8);
+            background-color: #1c3643; 
+            position: relative;
+        }
+
+        .logo-container::before {
+            content: '🎁'; /* Ícone de presente universal */
+            font-size: 80px;
+            color: #1a9942;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* INPUTS E BOTÕES */
+        input, textarea {
+            padding: 12px;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid #1a9942; 
+            background-color: #0b1a1f; 
+            color: white;
+            resize: vertical;
+        }
+        
+        button {
+            padding: 12px;
+            font-size: 16px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #d11a2a; 
+            border: none;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: #a81521; 
+        }
+
+        /* BOTÃO DE RESET/ADMIN */
+        #reset-button {
+            background-color: #555;
+            margin-top: 20px;
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        #reset-button:hover {
+            background-color: #333;
+        }
+        
+        /* BOTÃO DE INICIAR SORTEIO */
+        #iniciar-sorteio-btn {
+            background-color: #1a9942; /* Verde diferente para destaque */
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(26, 153, 66, 0.4);
+        }
+
+        #iniciar-sorteio-btn:hover {
+            background-color: #147a34;
+        }
+
+        p a {
+            color: #1a9942; 
+            text-decoration: none;
+        }
+
+        /* CONTEÚDO E CARDS */
+        .card {
+            background: #2a4c5a;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 1px dashed #1a9942;
+        }
+
+        .observacao-list {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            text-align: center;
+            font-style: italic;
+            background-color: #2a4c5a;
+        }
+        
+        /* CONTROLE DE EXIBIÇÃO DE TELA */
+        .login-container, .cadastro-container, .sorteio-container {
+            display: none;
+        }
+
+        .active {
+            display: block !important; 
+        }
+
+        /* ANIMAÇÃO DE NEVE */
+        .snowflake {
+            color: #fff;
+            font-size: 1em;
+            position: absolute;
+            top: -10px;
+            z-index: -1;
+            user-select: none;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(0, 100vh); opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="snow-container"></div>
+
+<div class="logo-container"></div>
+
+<div id="container"> 
+
+    <div class="login-container" id="login-container">
+        <h1>Amigo Oculto de Natal</h1>
+        <p id="first-time-msg" style="color: #1a9942; text-align: center; display: none;">Seja o primeiro a se cadastrar!</p>
+        
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Nome de usuário" />
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Senha" />
+        </div>
+        <button onclick="login()">🎅 Entrar</button>
+        <p id="login-error" style="color: red; display: none; text-align: center;">Usuário ou senha incorretos!</p>
+        <p style="text-align: center;">Não tem uma conta? <a href="javascript:void(0);" onclick="showCadastro()">Cadastre-se</a></p>
+
+        <button id="reset-button" onclick="resetDatabase()">🗑️ Resetar Tudo (Admin)</button>
+
+    </div>
+
+    <div class="cadastro-container" id="cadastro-container">
+        <h1>Novo Participante</h1>
+        <div class="input-group">
+            <input type="text" id="new-username" placeholder="Escolha um nome de usuário" />
+        </div>
+        <div class="input-group">
+            <input type="password" id="new-password" placeholder="Escolha uma senha" />
+        </div>
+        <div class="input-group">
+            <input type="password" id="confirm-password" placeholder="Confirme a senha" />
+        </div>
+        <button onclick="cadastrar()">🎁 Cadastrar</button>
+        <p id="cadastro-error" style="color: red; display: none; text-align: center;">Erro no cadastro, verifique os dados!</p>
+        <p style="text-align: center;">Já tem uma conta? <a href="javascript:void(0);" onclick="showLogin()">Faça login</a></p>
+    </div>
+
+    <div class="sorteio-container" id="sorteio-container">
+        <h1>Feliz Natal, <span id="user-name"></span>!</h1>
+        <p style="text-align: center;">Valor de Presente: **R$ 50,00** 💸</p>
+
+        <div id="resultados"></div>
+
+        <button id="iniciar-sorteio-btn" onclick="iniciarSorteio()" style="display: none;">INICIAR SORTEIO</button>
+        
+        <button id="revelar-amigo-btn" onclick="verAmigoOculto()" style="display: none;">🌟 Revelar Amigo Oculto</button>
+
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            
+            <div style="flex: 1;">
+                <h3>📝 Minhas Dicas de Presente:</h3>
+                <textarea id="observacao-input" placeholder="Ex: Gosto de café, jogos, e minha cor favorita é azul. (Máx 150 caracteres)" maxlength="150" style="min-height: 80px;"></textarea>
+                <button onclick="salvarObservacao()">Salvar Dica</button>
+                <div class="observacao-list" id="observacao-list">
+                    </div>
+            </div>
+
+            <div style="flex: 1;">
+                <h3>💡 Exemplo de Presente Geral:</h3>
+                <div class="card" id="exemplo-presente-geral" style="min-height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                    </div>
+            </div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px;"><a href="javascript:void(0);" onclick="logout()">Sair (Logout)</a></p>
+    </div>
+</div> <script>
+    const presentesGerais = [
+        'Caneca Temática + Café Gourmet',
+        'Copo Térmico/Squeeze',
+        'Livro Bestseller (Capa Comum)',
+        'Fone de Ouvido Básico (In-ear)',
+        'Kit Chocolates Finos e Importados',
+        'Voucher de R$50 em Loja Online/Streaming',
+        'Mousepad Gamer Grande',
+        'Meias Personalizadas Divertidas',
+        'Power Bank Compacto (de entrada)',
+        'Baralho Premium/Jogo de Cartas Pequeno'
+    ];
+    
+    // --- VARIÁVEIS GLOBAIS DE ESTADO ---
+    let usuarios = [];
+    let sorteioFeito = false; 
+    let usuarioAtual = null;
+
+    // --- FUNÇÕES DE PERSISTÊNCIA ---
+    function loadUsers() {
+        try {
+            const storedUsers = localStorage.getItem('usuarios');
+            return storedUsers ? JSON.parse(storedUsers) : [];
+        } catch (e) {
+            console.error("Erro ao carregar usuários do localStorage:", e);
+            return [];
+        }
+    }
+    
+    function saveUsers(users) {
+        try {
+            localStorage.setItem('usuarios', JSON.stringify(users));
+        } catch (e) {
+            console.error("Erro ao salvar usuários no localStorage:", e);
+        }
+    }
+
+    // Inicializa variáveis
+    usuarios = loadUsers();
+    sorteioFeito = usuarios.length >= 2 && usuarios.every(u => u.amigoOculto !== ''); 
+
+    // --- FUNÇÃO DE RESET DE DADOS ---
+    function resetDatabase() {
+        const confirmReset = confirm("ATENÇÃO: Isso irá DESTRUIR TODOS os cadastros e sorteios salvos. Tem certeza que deseja resetar?");
+        
+        if (confirmReset) {
+            localStorage.removeItem('usuarios');
+            alert("Banco de dados resetado com sucesso! Recarregando...");
+            window.location.reload(); 
+        }
+    }
+
+    // --- FUNÇÕES DE NAVEGAÇÃO ---
+    function navigateTo(screenId) {
+        document.getElementById('login-container').classList.remove('active');
+        document.getElementById('cadastro-container').classList.remove('active');
+        document.getElementById('sorteio-container').classList.remove('active');
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function showCadastro() {
+        navigateTo('cadastro-container');
+        document.getElementById('cadastro-error').style.display = 'none';
+        document.getElementById('first-time-msg').style.display = 'none';
+    }
+
+    function showLogin() {
+        navigateTo('login-container');
+        document.getElementById('login-error').style.display = 'none';
+        
+        usuarios = loadUsers();
+        document.getElementById('first-time-msg').style.display = usuarios.length === 0 ? 'block' : 'none';
+    }
+    
+    window.onload = showLogin;
+
+    // --- FUNÇÃO DE CADASTRO ---
+    function cadastrar() {
+        const username = document.getElementById('new-username').value.trim();
+        const password = document.getElementById('new-password').value.trim();
+        const confirmPassword = document.getElementById('confirm-password').value.trim();
+        const erroDiv = document.getElementById('cadastro-error');
+        
+        if (password !== confirmPassword || username.length < 3 || password.length < 3) {
+            erroDiv.textContent = 'Erro: Senhas não conferem ou nome/senha muito curtos (mínimo 3 caracteres)!';
+            erroDiv.style.display = 'block';
+            return;
+        }
+
+        usuarios = loadUsers(); 
+
+        if (usuarios.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+            erroDiv.textContent = 'Erro: Nome de usuário já existe!';
+            erroDiv.style.display = 'block';
+            return;
+        }
+
+        // Se o sorteio já foi feito, um novo cadastro anularia o sorteio, então resetamos a flag.
+        if (sorteioFeito) {
+            usuarios.forEach(u => {
+                u.amigoOculto = '';
+                u.presenteSorteado = '';
+            });
+            sorteioFeito = false;
+        }
+        
+        usuarios.push({ username, password, amigoOculto: '', presenteSorteado: '', observacao: '' }); 
+        saveUsers(usuarios); 
+        
+        alert("🎉 Cadastro realizado com sucesso! Faça login para continuar.");
+        
+        document.getElementById('new-username').value = '';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+        
+        showLogin();
+    }
+    
+    // --- FUNÇÃO DE LOGIN ---
+    function login() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const erroDiv = document.getElementById('login-error');
+        
+        usuarios = loadUsers();
+        
+        const usuario = usuarios.find(u => u.username === username && u.password === password);
+
+        if (usuario) {
+            usuarioAtual = usuario;
+            navigateTo('sorteio-container');
+            
+            document.getElementById('user-name').textContent = usuario.username;
+            
+            // Recarrega o estado do sorteio (NÃO CHAMA sortear() automaticamente)
+            sorteioFeito = usuarios.length >= 2 && usuarios.every(u => u.amigoOculto !== ''); 
+            
+            mostrarResultado(); 
+            document.getElementById('observacao-input').value = usuario.observacao || '';
+            carregarObservacao(); 
+            
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            
+        } else {
+            erroDiv.textContent = 'Usuário ou senha incorretos!';
+            erroDiv.style.display = 'block';
+        }
+    }
+
+    // --- FUNÇÃO DE LOGOUT ---
+    function logout() {
+        usuarioAtual = null;
+        showLogin();
+    }
+
+    // --- FUNÇÕES DE SORTEIO E DADOS ---
+    
+    // NOVO: Função para iniciar o sorteio manualmente
+    function iniciarSorteio() {
+        usuarios = loadUsers();
+        if (usuarios.length < 2) {
+            alert("É preciso ter pelo menos 2 participantes cadastrados para iniciar o sorteio!");
+            return;
+        }
+
+        const confirmacao = confirm(`Deseja realmente iniciar o sorteio para ${usuarios.length} participantes? Esta ação definirá os amigos ocultos e não poderá ser desfeita.`);
+        
+        if (confirmacao) {
+            sortear(); 
+            if (sorteioFeito) {
+                alert("Sorteio realizado com sucesso! Agora você pode ver seu Amigo Oculto.");
+                mostrarResultado(); // Atualiza a tela
+            } else {
+                alert("Erro: Não foi possível realizar o sorteio. Tente novamente ou verifique se há participantes suficientes.");
+            }
+        }
+    }
+
+    function sortear() {
+        // Se o sorteio já foi feito, não faz de novo.
+        if (sorteioFeito || usuarios.length < 2) return; 
+
+        let participantesNomes = usuarios.map(u => u.username);
+        let sorteiosAmigo = {}; 
+        let tentativa = 0;
+        
+        while (tentativa < 100) { 
+            let conseguiuSortear = true;
+            let recebedoresEmbaralhados = [...participantesNomes].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < participantesNomes.length; i++) {
+                const doador = participantesNomes[i];
+                const recebedor = recebedoresEmbaralhados[i];
+                // Evita que a pessoa tire ela mesma
+                if (doador === recebedor) {
+                    conseguiuSortear = false;
+                    break; 
+                }
+                sorteiosAmigo[doador] = recebedor;
+            }
+
+            if (conseguiuSortear) break;
+            tentativa++;
+        }
+        
+        if (!sorteiosAmigo[participantesNomes[0]]) {
+             sorteioFeito = false;
+             return;
+        }
+        
+        let presentesEmbaralhados = [...presentesGerais].sort(() => Math.random() - 0.5);
+        
+        for (const usuario of usuarios) {
+            usuario.amigoOculto = sorteiosAmigo[usuario.username];
+            const index = participantesNomes.indexOf(usuario.username);
+            usuario.presenteSorteado = presentesEmbaralhados[index % presentesEmbaralhados.length]; 
+        }
+
+        sorteioFeito = true;
+        saveUsers(usuarios); 
+    }
+    
+    function checkButtonVisibility() {
+        const iniciarBtn = document.getElementById('iniciar-sorteio-btn');
+        const revelarBtn = document.getElementById('revelar-amigo-btn');
+        
+        // Exibe o botão de Iniciar Sorteio se houver 2+ usuários e o sorteio NÃO foi feito
+        if (usuarios.length >= 2 && !sorteioFeito) {
+            iniciarBtn.style.display = 'block';
+            iniciarBtn.textContent = `🚨 INICIAR SORTEIO AGORA (${usuarios.length} PARTICIPANTES) 🚨`;
+            revelarBtn.style.display = 'none';
+        } 
+        // Exibe o botão de Revelar se o sorteio JÁ foi feito
+        else if (sorteioFeito) {
+            iniciarBtn.style.display = 'none';
+            revelarBtn.style.display = 'block';
+        }
+        // Caso contrário (menos de 2 usuários e sorteio pendente)
+        else {
+            iniciarBtn.style.display = 'none';
+            revelarBtn.style.display = 'none';
+        }
+    }
+
+    function mostrarExemploGeral() {
+        const indiceAleatorio = Math.floor(Math.random() * presentesGerais.length);
+        const presente = presentesGerais[indiceAleatorio];
+        
+        const divExemplo = document.getElementById('exemplo-presente-geral');
+        
+        divExemplo.innerHTML = `
+            <p style="margin: 0; color: #fff;">Não sabe o que pedir? Que tal:</p>
+            <h4 style="color: #1a9942; margin: 10px 0;">"${presente}"</h4>
+        `;
+    }
+    
+    function mostrarResultado() {
+        const divResultados = document.getElementById('resultados');
+
+        if (!usuarioAtual) return;
+
+        // Controla qual botão deve aparecer
+        checkButtonVisibility(); 
+        
+        // Exibe o exemplo de presente geral
+        mostrarExemploGeral(); 
+
+        if (!sorteioFeito) {
+             const numUsuarios = loadUsers().length;
+             divResultados.innerHTML = `
+                <div class="card" style="text-align: center; border-color: #d11a2a; color: #fff;">
+                    <h3>Sorteio Pendente</h3>
+                    <p>Atualmente: **${numUsuarios} pessoas** cadastradas.</p>
+                    <p>${numUsuarios < 2 ? 'Mínimo de **2 pessoas** é necessário.' : 'Clique no botão verde acima para iniciar o sorteio!'}</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Se o sorteio foi feito, exibe o resultado
+        const amigoOculto = usuarios.find(u => u.username === usuarioAtual.amigoOculto);
+        const observacaoAmigo = amigoOculto ? amigoOculto.observacao || 'Nenhuma dica registrada.' : 'Usuário não encontrado.';
+        
+        divResultados.innerHTML = `
+            <div class="card">
+                <h3>Seu Amigo Oculto está pronto para ser revelado!</h3>
+                <p>🎁 Presente que você vai receber (Exemplo): **${usuarioAtual.presenteSorteado}**</p>
+                <hr style="border-color: #444; margin: 10px 0;">
+                <h4>Prévia da Dica do Seu Amigo:</h4>
+                <p style="color: #d11a2a;">*Para ver o nome, clique em **"Revelar Amigo Oculto"**</p>
+            </div>
+        `;
+    }
+
+    function verAmigoOculto() {
+        if (!usuarioAtual || !sorteioFeito) {
+            alert("O sorteio ainda não foi realizado!");
+            return;
+        }
+        
+        const amigoOculto = usuarios.find(u => u.username === usuarioAtual.amigoOculto);
+        const observacaoAmigo = amigoOculto ? amigoOculto.observacao || 'Nenhuma dica registrada.' : 'Lista indisponível.';
+        
+        alert(`Seu amigo oculto é: ${usuarioAtual.amigoOculto}\n\nLembre-se: O valor do presente é R$ 50,00.\n\nDica/Observação de ${usuarioAtual.amigoOculto}:\n${observacaoAmigo}`);
+    }
+
+    function salvarObservacao() {
+        if (!usuarioAtual) return;
+        const observacao = document.getElementById('observacao-input').value.trim();
+        
+        usuarioAtual.observacao = observacao;
+        const index = usuarios.findIndex(u => u.username === usuarioAtual.username);
+        if (index !== -1) {
+            usuarios[index] = usuarioAtual;
+        }
+        saveUsers(usuarios); 
+        
+        alert(observacao ? "Sua dica foi registrada!" : "Observação removida.");
+        
+        carregarObservacao();
+        mostrarResultado(); 
+    }
+    
+    function carregarObservacao() {
+        const listaDiv = document.getElementById('observacao-list');
+        const observacao = usuarioAtual ? usuarioAtual.observacao : '';
+        
+        if (observacao) {
+            listaDiv.innerHTML = `Sua Dica Atual: "${observacao}"`;
+            listaDiv.style.backgroundColor = '#1a9942'; 
+            listaDiv.style.color = '#fff';
+            listaDiv.style.fontWeight = 'bold';
+        } else {
+            listaDiv.innerHTML = 'Nenhuma dica salva ainda. Salve uma acima!';
+            listaDiv.style.backgroundColor = '#2a4c5a'; 
+            listaDiv.style.color = '#ddd';
+            listaDiv.style.fontWeight = 'normal';
+        }
+    }
+    
+    // --- ANIMAÇÃO DE NEVE ---
+    function createSnowflake() {
+        const snowContainer = document.getElementById('snow-container');
+        if (!snowContainer) return;
+
+        const flake = document.createElement('div');
+        flake.classList.add('snowflake');
+        flake.textContent = '❅'; 
+
+        const size = Math.random() * 0.8 + 0.4; 
+        const duration = Math.random() * 10 + 10; 
+        const delay = Math.random() * 10; 
+        const left = Math.random() * 100; 
+
+        flake.style.fontSize = `${size}em`;
+        flake.style.left = `${left}vw`;
+        flake.style.animationDuration = `${duration}s`;
+        flake.style.animationDelay = `${delay}s`;
+        
+        flake.addEventListener('animationend', () => {
+             flake.remove();
+             if (Math.random() > 0.1) createSnowflake(); 
+        });
+
+        snowContainer.appendChild(flake);
+    }
+    
+    for (let i = 0; i < 50; i++) {
+        createSnowflake();
+    }
+</script>
+
+</body>
+</html>
